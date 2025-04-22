@@ -47,7 +47,7 @@ export function NotificationProvider({ children }) {
         fetchNotifications();
         const channel = window.Echo.channel('admin-notifications');
         
-        channel.listen('.user-registered', (data) => {
+        channel.listen('user-registered', (data) => {
             console.log('Received real-time notification:', data); 
             addNotification(data.notification);
         });
