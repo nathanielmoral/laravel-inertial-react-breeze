@@ -31,32 +31,33 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-    ]);
-
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-    ]);
-
-    // Create notification in database
-    $notification = \App\Models\Notification::create([
-        'text' => "New user {$user->name} has registered.",
-        'user_id' => $user->id,
-        'type' => 'user_registered',
-    ]);
-
-    // Broadcast the event
-    event(new Registered($user));
-    event(new UserRegistered($user, $notification));
-
-    Auth::login($user);
-
-    return redirect(route('dashboard', absolute: false));
-}
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+    
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+    
+        // Create and refresh the notification
+        $notification = Notification::create([
+            'text' => "New user {$user->name} has registered.",
+            'user_id' => $user->id,
+            'type' => 'user_registered',
+        ])->fresh();
+    
+        // Broadcast both events if needed
+        event(new Registered($user));
+        event(new UserRegistered($user, $notification));
+    
+        Auth::login($user);
+    
+        return redirect(route('dashboard', absolute: false));
+    }
+    
 }

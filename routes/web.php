@@ -40,7 +40,7 @@ Route::middleware(['auth', AdminMiddleware::class])
         
         // Admin-only notification routes
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
-        Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::post('notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     });
 
 Route::middleware(['test'])->get('/test', function () {

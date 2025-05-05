@@ -4,8 +4,7 @@ import { useNotifications } from '../../Contexts/NotificationContext';
 
 export default function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { notifications, markAsRead } = useNotifications();
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const { notifications, markAsRead, unreadCount } = useNotifications();
   
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -22,7 +21,8 @@ export default function NotificationsDropdown() {
 
   const handleMarkAllAsRead = () => {
     markAsRead();
-    setIsOpen(false);
+    // We no longer need to close the dropdown after marking all as read
+    // The user might want to continue viewing the notifications
   };
 
   const handleNotificationClick = (id) => {
@@ -34,19 +34,26 @@ export default function NotificationsDropdown() {
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="p-1 rounded-full text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <span className="sr-only">View notifications</span>
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white dark:ring-gray-800 transition-colors"></span>
+          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white dark:ring-gray-800 transition-colors" aria-label={`${unreadCount} unread notifications`}></span>
         )}
       </button>
       
       {/* Notifications panel */}
       {isOpen && (
-        <div className="z-50 origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 dark:ring-gray-700 focus:outline-none transition-colors">
+        <div 
+          className="z-50 origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 dark:ring-gray-700 focus:outline-none transition-colors"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="notification-button"
+        >
           <div className="py-1" role="none">
-            <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-center">
               <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200 transition-colors">Notifications</h3>
             </div>
             <div className="max-h-60 overflow-y-auto">
@@ -60,6 +67,7 @@ export default function NotificationsDropdown() {
                         ? 'bg-blue-50 dark:bg-blue-900/20' 
                         : ''
                     }`}
+                    role="menuitem"
                   >
                     <p className="text-sm text-gray-700 dark:text-gray-300 transition-colors">{notification.text}</p>
                     <span className="text-xs text-gray-500">
@@ -78,6 +86,7 @@ export default function NotificationsDropdown() {
                 <button 
                   onClick={handleMarkAllAsRead}
                   className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                  role="menuitem"
                 >
                   Mark all as read
                 </button>

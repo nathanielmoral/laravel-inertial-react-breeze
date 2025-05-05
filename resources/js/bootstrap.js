@@ -11,7 +11,7 @@ window.Pusher = Pusher;
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true
+    key: '6a1d8dc597e062e6bf6e', // Your actual Pusher key
+    cluster: 'ap1',
+    forceTLS: true, // Gumamit ng TLS (https) for hosted Pusher
 });
